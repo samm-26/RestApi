@@ -52,7 +52,7 @@ app.get('/restaurant',(req,res) => {
     else if(req.query.mealtype){
         query={"type.mealtype":req.query.mealtype}
     }
-    db.collection('restaurent').find(query).toArray((err,result) =>{
+    db.collection('restaurant').find(query).toArray((err,result) =>{
         if(err) throw err;
         res.send(result)
     })
