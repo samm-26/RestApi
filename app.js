@@ -62,6 +62,32 @@ app.get('/restaurantDetails/:id',(req,res) => {
     console.log(req.params.id)
     var query = {_id:req.params.id}
     db.collection('restaurant').find(query).toArray((err,result) =>{
+        if(err) throw erss;
+        res.send(result)
+    })
+});
+
+
+app.get('/restaurantlist/:mealtype', (req,res) => {
+    var query = {"type.mealtype":req.params.mealtype};
+    var sort = {cost:-1}
+    if(req.query.city && req.query.sort){
+        query={"type.mealtype":req.params.mealtype,"city":req.query.city}
+        sort = {cost:Number(req.query.sort)}
+    }else if(req.query.cuisine  && req.query.sort){
+        query={"type.mealtype":req.params.mealtype,"Cuisine.cuisine":(req.query.cuisine)}
+        sort = {cost:Number(req.query.sort)}
+    }else if(req.query.lcost && req.query.hcost && req.query.sort){
+        query={"type.mealtype":req.params.mealtype,"cost":{$lt:parseInt(req.query.lcost),$gt:parseInt(req.query.hcost)} }
+        sort = {cost:Number(req.query.sort)}
+    }else if(req.query.city){
+        query={"type.mealtype":req.params.mealtype,"city":req.query.city}
+    }else if(req.query.cuisine){
+        query={"type.mealtype":req.params.mealtype,"Cuisine.cuisine":(req.query.cuisine)}
+    }else if(req.query.lcost && req.query.hcost){
+        query={"type.mealtype":req.params.mealtype,"cost":{$lt:parseInt(req.query.lcost),$gt:parseInt(req.query.hcost)} }
+    }
+    db.collection('restaurent').find(query).sort(sort).toArray((err,result) =>{
         if(err) throw err;
         res.send(result)
     })
@@ -72,6 +98,16 @@ app.get('/orders',(req,res) => {
     db.collection('orders').find({}).toArray((err,result) =>{
         if(err) throw err;
         res.send(result)
+    })
+});
+
+app.post('/placeorder',(req,res) => {
+    db.collection('orders').insertOne(req.body,(err,result) => {
+        if(err){
+            throw err
+        }else{
+            res.send('Data Added')
+        }
     })
 });
 
